@@ -201,10 +201,6 @@ module tb ();
   wire [7:0] uo_out;
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
-`ifdef GL_TEST
-  wire VPWR = 1'b1;
-  wire VGND = 1'b0;
-`endif
 
   // Replace tt_um_example with your module name:
   tt_um_rejunity_atari2600 user_project (
