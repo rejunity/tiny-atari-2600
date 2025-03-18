@@ -183,18 +183,10 @@ module tb ();
                      user_project.\flash_rom.addr[2] ,
                      user_project.\flash_rom.addr[1] ,
                      user_project.\flash_rom.addr[0] };
-`else 
-
+`elif GL_TEST
+`else
   wire [15:0] PC = user_project.atari2600.cpu.PC;
 `endif
-
-  qspi_rom_emu qspi_rom_emu(
-    .clk        (clk),
-    .reset      (~rst_n),
-    .sclk       ( uio_out[3]),
-    .select     ( uio_out[0]),
-    .cmd_addr_in({uio_out[5:4], uio_out[2:1]}),
-    .data_out   ({ uio_in[5:4], uio_in [2:1]}));
 
   // Wire up the inputs and outputs:
   reg clk;
@@ -205,6 +197,14 @@ module tb ();
   wire [7:0] uo_out;
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
+
+  qspi_rom_emu qspi_rom_emu(
+    .clk        (clk),
+    .reset      (~rst_n),
+    .sclk       ( uio_out[3]),
+    .select     ( uio_out[0]),
+    .cmd_addr_in({uio_out[5:4], uio_out[2:1]}),
+    .data_out   ({ uio_in[5:4], uio_in [2:1]}));
 
   // Replace tt_um_example with your module name:
   tt_um_rejunity_atari2600 user_project (
