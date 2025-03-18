@@ -5,6 +5,10 @@
    that can be driven / tested by the cocotb test.py.
 */
 
+`ifdef GL_TEST
+// `define GL_TEST_SKY130
+`endif
+
 module tb ();
 
   // Dump the signals to a VCD file. You can view it with gtkwave.
@@ -18,7 +22,7 @@ module tb ();
     #1;
   end
 
-`ifdef GL_TEST
+`ifdef GL_TEST_SKY130
   wire TIA_stall_cpu      = user_project.\atari2600.stall_cpu ;
   wire TIA_valid_read_cmd = user_project.\atari2600.tia.valid_read_cmd ;
   wire TIA_enabl          = user_project.\atari2600.tia.enabl ;
@@ -206,7 +210,7 @@ module tb ();
   tt_um_rejunity_atari2600 user_project (
 
       // Include power ports for the Gate Level test:
-`ifdef GL_TEST
+`ifdef GL_TEST_SKY130
       .VPWR(VPWR),
       .VGND(VGND),
 `endif
