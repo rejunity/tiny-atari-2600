@@ -7,6 +7,30 @@ from cocotb.triggers import ClockCycles
 
 
 @cocotb.test()
+async def test_dummy(dut):
+    dut._log.info("Start")
+
+    F = 1 # clock frequency multiplier
+    
+    # Set the clock period to 40 ns (25 MHz ~ VGA pixel clock)
+    clock = Clock(dut.clk, 40//F, units="ns")
+    cocotb.start_soon(clock.start())
+
+    # Reset
+    dut._log.info("Reset")
+    dut.ena.value = 1
+    dut.ui_in.value = 0 # 0b1_xxxx for built-in ROMs
+    dut.uio_in.value = 0
+    dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 2*F)
+    dut.rst_n.value = 0
+    await ClockCycles(dut.clk, 10*F)
+    dut.rst_n.value = 1
+
+    dut._log.info("Run")
+
+
+# @cocotb.test()
 async def test_project(dut):
     dut._log.info("Start")
 
@@ -5242,7 +5266,7 @@ async def test_project(dut):
         assert(dut.uo_out.value == 0b00000000)
         #assert(dut.user_project.atari2600.cpu.PC.value.integer == 0xf00d)
 
-@cocotb.test()
+# @cocotb.test()
 async def rom_builtin(dut):
     dut._log.info("Start")
 

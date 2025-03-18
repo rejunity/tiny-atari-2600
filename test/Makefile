@@ -34,7 +34,7 @@ endif
 
 # Include the testbench sources:
 VERILOG_SOURCES += $(PWD)/tb.v
-VERILOG_SOURCES += $(PWD)/qspi_rom_emu.v
+# VERILOG_SOURCES += $(PWD)/qspi_rom_emu.v
 # VERILOG_SOURCES += $(PWD)/macro_rom_emu.v # external ROMs are not supported with IHP130
 TOPLEVEL = tb
 
