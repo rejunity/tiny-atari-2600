@@ -54,7 +54,7 @@ module tt_um_rejunity_atari2600 (
     .reset(~rst_n),
     .system_enable(system_enable),
     // inputs
-    .input_switches(switches[4:1]),
+    .input_switches(switches),
     .input_joystick_0(joystick_0),
     .input_joystick_1(joystick_1),
     .input_paddle_0(8'd200),
@@ -124,39 +124,98 @@ module tt_um_rejunity_atari2600 (
   assign uio_oe  = {     1'b1,      1'b1,       6'b000000};
 `endif
 
-  // Inputs
+  // Inputs --- 1: ATARI JOYSTICK to PMOD ---------------------------------------------------------
+  // https://en.wikipedia.org/wiki/Atari_joystick_port
   // 
-  // Atari joystick port
+  // Atari joystick port (active low)
   //     1 2 3 4 5
   //      6 7 8 9
-  //  1 Up, 2 Down, 3 Left, 4 Right, 5 Paddle B
-  //  6 Fire,                        9 Paddle A
-  //  (7 +5V), (8 ground)
+  // 
+  //  1 UP, 2 DOWN, 3 LEFT, 4 RIGHT, (5 Paddle B)
+  //  6 FIRE, (7 +5V), 8 GROUND, (9 Paddle A)
+  //             
 
-  // Define similar layout for PMOD
-  //  0 Up, 1 Down, 2 Left, 3 Right
-  //  4 Fire, 5 Joystick 1/2, 6 Switches, 7 Reset
+  // Define similar layout for PMOD (active low)
+  //  0 UP, 1 DOWN, 2 LEFT, 3 RIGHT
+  //  4 FIRE, 5 SELECT, (6 Switches), 7 START
+
+  // Inputs --- 2: SNES GAMEPAD to PMOD -----------------------------------------------------------
+  // https://github.com/psychogenic/gamepad-pmod
+  // 
+  // PMOD layout (active high)
+  //  4 Data, 5 Clock, 6 Latch
 
   // TODO: fix a weird mapping in TIA.v / PIA.v
   // localparam UP = 3, RIGHT = 6, LEFT = 5, DOWN = 4, SELECT = 2, RESET = 0, FIRE = 1;
-  //wire [6:0] buttons = {~ui_in[6:1], ui_in[0]};
-  reg [6:0] joystick_0;
-  reg [6:0] joystick_1;
-  reg [4:0] switches;
-  wire [6:0] joypmod = {~ui_in[3], ~ui_in[2], ~ui_in[1], ~ui_in[0], switches[0] /* select */, ~ui_in[4], ~ui_in[7]};
+  //            {RIGHT, LEFT, DOWN, UP, SELECT, FIRE, RESET}
+  wire [6:0] atari_joystick_0 = {ui_in[3], ui_in[2], ui_in[1], ui_in[0], ui_in[5] /* select */, ui_in[4], ui_in[7] /* reset */};
+  wire [6:0] atari_joystick_1 = atari_joystick_0; // only 1 joystick is suppported ATM
+  wire       atari_latch_switches = (ui_in[6] == 0);
+  wire [3:0] atari_switches = ui_in[3:0];
 
+  wire [6:0] gamepad_joystick_0;
+  wire [6:0] gamepad_joystick_1 = gamepad_joystick_0; // only 1 joystick is suppported ATM
+  wire       gamepad_latch_switches;
+  wire [3:0] gamepad_switches = {gamepad_joystick_0[6:3]};
+
+  gamepad_pmod_single gamepad_pmod (
+      // Inputs:
+      .rst_n(rst_n),
+      .clk(clk),
+      .pmod_data (ui_in[6]),
+      .pmod_clk  (ui_in[5]),
+      .pmod_latch(ui_in[4]),
+      // Outputs:
+      .b(),
+      .y(),
+      .select(gamepad_joystick_0[2]),
+      .start (gamepad_joystick_0[0]),
+      .up    (gamepad_joystick_0[3]),
+      .down  (gamepad_joystick_0[4]),
+      .left  (gamepad_joystick_0[5]),
+      .right (gamepad_joystick_0[6]),
+      .a     (gamepad_joystick_0[1]),
+      .x(),
+      .l     (gamepad_latch_switches),
+      .r()
+  );
+
+  // gamepad_pmod_dual gamepad_pmod (
+  //     // Inputs:
+  //     .rst_n(rst_n),
+  //     .clk(clk),
+  //     .pmod_data(ui_in[6]),
+  //     .pmod_clk(ui_in[5]),
+  //     .pmod_latch(ui_in[4]),
+  //     // Outputs:
+  //     .b(),
+  //     .y(),
+  //     .select({gamepad_joystick_1[2], gamepad_joystick_0[2]}),
+  //     .start ({gamepad_joystick_1[0], gamepad_joystick_0[0]}),
+  //     .up    ({gamepad_joystick_1[3], gamepad_joystick_0[3]}),
+  //     .down  ({gamepad_joystick_1[4], gamepad_joystick_0[4]}),
+  //     .left  ({gamepad_joystick_1[5], gamepad_joystick_0[5]}),
+  //     .right ({gamepad_joystick_1[6], gamepad_joystick_0[6]}),
+  //     .a     ({gamepad_joystick_1[1], gamepad_joystick_0[1]}),
+  //     .x(),
+  //     .l     ({dummy_unused, gamepad_latch_switches}),
+  //     .r()
+  // );
+
+  wire gamepad_not_atari_joy = ({ui_in[7], ui_in[3:0]} == 5'b00000); // Gamepad is selected iff all input pullups are OFF
+                                                                     // This is a default state of DIP/piano on TT boards
+                                                                     // Conversely, pullups must be ON for Atari joysticks
+  wire [6:0] joystick_0 = gamepad_not_atari_joy ? ~gamepad_joystick_0 : atari_joystick_0;
+  wire [6:0] joystick_1 = gamepad_not_atari_joy ? ~gamepad_joystick_1 : atari_joystick_1;
+  wire latch_switches = gamepad_not_atari_joy ? gamepad_latch_switches : atari_latch_switches;
+
+  reg [3:0] switches;
   always @(posedge clk) begin
     if (~rst_n) begin
-      joystick_0 <= {6'b111111, 1'b0};
-      joystick_1 <= {6'b111111, 1'b0};
-      switches   <=  5'b11111;
+      switches <= 4'b1111;
     end else begin
-      if (ui_in[6])
-        switches <= ~ui_in[4:0];
-      if (~ui_in[5])
-        joystick_0 <= joypmod;
-      else
-        joystick_1 <= joypmod;
+      if (latch_switches)
+        switches <= gamepad_not_atari_joy ? ~gamepad_switches : atari_switches;
     end
   end
 
