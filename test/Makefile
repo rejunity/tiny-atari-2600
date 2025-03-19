@@ -34,18 +34,20 @@ endif
 
 # Include the testbench sources:
 VERILOG_SOURCES += $(PWD)/tb.v
-# VERILOG_SOURCES += $(PWD)/qspi_rom_emu.v
+# VERILOG_SOURCES += $(PWD)/qspi_rom_emu.v # compilation error in IHP130 devcontainer
 # VERILOG_SOURCES += $(PWD)/macro_rom_emu.v # external ROMs are not supported with IHP130
 TOPLEVEL = tb
 
-# MODULE is the basename of the Python test file
-ifneq ($(GATES),yes)
-MODULE ?= test
-else
-# zealot.py is a recorded value file from a SIM run
-# useful to compare SIM and GATES results in a more automated way
-MODULE ?= zealot
-endif
+MODULE = test
+# IHP130: disabled recorded test (aka zealot)
+# # MODULE is the basename of the Python test file
+# ifneq ($(GATES),yes)
+# MODULE ?= test
+# else
+# # zealot.py is a recorded value file from a SIM run
+# # useful to compare SIM and GATES results in a more automated way
+# MODULE ?= zealot
+# endif
 
 # include cocotb's make rules to take care of the simulator setup
 include $(shell cocotb-config --makefiles)/Makefile.sim
