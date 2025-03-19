@@ -21,6 +21,7 @@ project:
     - "vga_hvsync_generator.v"
     - "palette_24bpp.v"
     - "qspi_flash.v"
+    - "gamepad_pmod.v"
     - "atari2600.v"
     - "6502.v"
     - "ALU.v"
@@ -30,14 +31,14 @@ project:
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
   # Inputs
-  ui[0]: "UP    / Switch 1"
-  ui[1]: "DOWN  / Switch 2"
-  ui[2]: "LEFT  / Switch BW"
-  ui[3]: "RIGHT / Switch 3"
-  ui[4]: "FIRE"
-  ui[5]: "Joystick 1 / 2"
-  ui[6]: "Switches"
-  ui[7]: "RESET"
+  ui[0]: "UP       / Difficulty Switch P1"
+  ui[1]: "DOWN     / Difficulty Switch P2"
+  ui[2]: "LEFT     / Monochrome Switch"
+  ui[3]: "RIGHT"
+  ui[4]: "FIRE     / Gamepad LATCH"
+  ui[5]: "SELECT   / Gamepad CLK"
+  ui[6]: "Switches / Gamepad DATA"
+  ui[7]: "START"
 
   # Outputs
   uo[0]: "R1"
