@@ -25,12 +25,12 @@ module tt_um_rejunity_atari2600 (
     input  wire       rst_n     // reset_n - low to reset
 );
   
-  // Configuration captured during RESET phase
+  // Configuration captured during the RESET phase
   reg [7:0] rom_config;
 
   always @(posedge clk)
     if (~rst_n)
-      rom_config <= ui_in;
+      rom_config <= {ui_in[7], ui_in[7] ? (~ui_in[6:0]) : ui_in[6:0]}; // invert ROM config address bits if START pin is in PULLUP mode
 
   // -------------------------------------------------------------------------
 
@@ -357,7 +357,7 @@ module tt_um_rejunity_atari2600 (
     // rom[12'hFFD] <= 8'hF0; rom[12'hFFC] <= 8'h00;
   end
 
-  wire use_internal_rom = rom_config[4];
+  wire use_internal_rom = rom_config[3:0] == 4'b1111;
   reg  [7:0] internal_rom_data;
   reg  [7:0] external_rom_data;
   reg  [7:0] ram_data;
@@ -435,7 +435,8 @@ module tt_um_rejunity_atari2600 (
 `ifdef QSPI_ROM
   reg spi_restart;
   // wire [23:0] spi_address = {4'b0001, rom_config[7:0], address_bus[11:0]}; // iceprog -o1024k
-  wire [23:0] spi_address = {rom_config[7:5], 1'b1, rom_config[3:0], 4'b0000, address_bus[11:0]}; // iceprog -o1024k
+  // wire [23:0] spi_address = {rom_config[6:4], 1'b1, rom_config[3:0], 4'b0000, address_bus[11:0]}; // iceprog -o1024k
+  wire [23:0] spi_address = {4'b0001, rom_config[3:0], 4'b0000, address_bus[11:0]}; // iceprog -o1024k
   wire        need_new_rom_data = valid_rom_address_on_bus      && !rom_data_pending && !rom_addr_in_cache;
   wire        spi_start_read = !spi_busy && (need_new_rom_data || spi_restart);
   wire        spi_stop_read =   spi_busy && need_new_rom_data;
