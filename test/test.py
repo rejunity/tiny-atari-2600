@@ -19,7 +19,7 @@ async def test_dummy(dut):
     # Reset
     dut._log.info("Reset")
     dut.ena.value = 1
-    dut.ui_in.value = 0 # rom config on reset
+    dut.ui_in.value = 0 # external ROM, offset=0
     dut.uio_in.value = 0
     dut.rst_n.value = 1
     await ClockCycles(dut.clk, 2*F)
@@ -30,7 +30,7 @@ async def test_dummy(dut):
     dut._log.info("Run")
 
 
-# @cocotb.test()
+@cocotb.test()
 async def test_project(dut):
     dut._log.info("Start")
 
@@ -43,7 +43,7 @@ async def test_project(dut):
     # Reset
     dut._log.info("Reset")
     dut.ena.value = 1
-    dut.ui_in.value = 0 # 0b1_xxxx for built-in ROMs
+    dut.ui_in.value = 0 # external ROM, offset=0
     dut.uio_in.value = 0
     dut.rst_n.value = 1
     await ClockCycles(dut.clk, 2*F)
@@ -64,7 +64,7 @@ async def test_project(dut):
         # await ClockCycles(dut.clk, 800*525*3*F)
         # await ClockCycles(dut.clk, 800*525*5*F)
         # await ClockCycles(dut.clk, 800*525*10*F)
-    else: # Pitfall
+    else: # Pitfall ROM
         await ClockCycles(dut.clk, 16)
         #assert(dut.user_project.atari2600.cpu.PC.value.integer == 0xfffd)
         await ClockCycles(dut.clk, 16)
