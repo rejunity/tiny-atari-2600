@@ -20,6 +20,9 @@ module qspi_rom_emu #(parameter ADDR_BITS = 24) (
 
   reg [ADDR_BITS-1:0] addr; // read address
 
+  reg [15:0] data;
+  reg [7:0] rom [4095:0]; initial $readmemh("../roms/rom.mem", rom, 0, 4095);
+
   reg sclk_prev; always @(posedge clk) sclk_prev <= sclk;
   wire sclk_negedge = sclk_prev != sclk && !sclk;
   reg  [7:0] counter;
@@ -46,11 +49,9 @@ module qspi_rom_emu #(parameter ADDR_BITS = 24) (
     end
   end
 
-  reg [15:0] data;
-  reg [7:0] rom [4095:0];
-  initial begin
-    $readmemh("../roms/rom.mem", rom, 0, 4095);
-    // DEBUG: override reset vector
-    // rom[12'hFFD] <= 8'hF0; rom[12'hFFC] <= 8'h00;
-  end  
+  // // DEBUG: override reset vector
+  // initial begin
+  //  rom[12'hFFD] <= 8'hF0; rom[12'hFFC] <= 8'h00;
+  // end  
+
 endmodule

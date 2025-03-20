@@ -33,9 +33,9 @@ VERILOG_SOURCES += $(PWD)/gate_level_netlist.v
 endif
 
 # Include the testbench sources:
-VERILOG_SOURCES += $(PWD)/tb.v
-# VERILOG_SOURCES += $(PWD)/qspi_rom_emu.v # compilation error in IHP130 devcontainer
+VERILOG_SOURCES += $(PWD)/qspi_rom_emu.v
 # VERILOG_SOURCES += $(PWD)/macro_rom_emu.v # external ROMs are not supported with IHP130
+VERILOG_SOURCES += $(PWD)/tb.v
 TOPLEVEL = tb
 
 MODULE = test

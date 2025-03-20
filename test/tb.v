@@ -24,6 +24,14 @@ module tb ();
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
 
+  qspi_rom_emu qspi_rom_emu(
+    .clk        (clk),
+    .reset      (~rst_n),
+    .sclk       ( uio_out[3]),
+    .select     ( uio_out[0]),
+    .cmd_addr_in({uio_out[5:4], uio_out[2:1]}),
+    .data_out   ({ uio_in[5:4], uio_in [2:1]}));
+
   // Replace tt_um_example with your module name:
   tt_um_rejunity_atari2600 user_project (
       .ui_in  (ui_in),    // Dedicated inputs
