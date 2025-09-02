@@ -14,16 +14,18 @@ jobs:
           submodules: recursive
 
       - name: Build GDS
-        uses: TinyTapeout/tt-gds-action@ttihp25a
+        uses: TinyTapeout/tt-gds-action@ttihp25b
         with:
           pdk: ihp
 
-  #precheck:
-  #  needs: gds
-  #  runs-on: ubuntu-24.04
-  #  steps:
-  #    - name: Run Tiny Tapeout Precheck
-  #      uses: TinyTapeout/tt-gds-action/precheck@ttihp25a
+  precheck:
+    needs: gds
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Run Tiny Tapeout Precheck
+        uses: TinyTapeout/tt-gds-action/precheck@ttihp25b
+        with:
+          pdk: ihp
 
   gl_test:
     needs: gds
@@ -35,7 +37,7 @@ jobs:
           submodules: recursive
 
       - name: GL test
-        uses: TinyTapeout/tt-gds-action/gl_test@ttihp25a
+        uses: TinyTapeout/tt-gds-action/gl_test@ttihp25b
         with:
           pdk: ihp
 
@@ -43,7 +45,7 @@ jobs:
     needs: gds
     runs-on: ubuntu-24.04
     permissions:
-      pages: write      # to deploy to Pages
-      id-token: write   # to verify the deployment originates from an appropriate source
+      pages: write # to deploy to Pages
+      id-token: write # to verify the deployment originates from an appropriate source
     steps:
-      - uses: TinyTapeout/tt-gds-action/viewer@ttihp25a
+      - uses: TinyTapeout/tt-gds-action/viewer@ttihp25b
