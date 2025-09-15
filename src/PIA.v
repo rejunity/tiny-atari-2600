@@ -55,7 +55,7 @@ module pia (
         case (adr_i) 
           7'h00: begin dat_o <= {buttons[6:3], buttons[6:3]}; end// SWCHA
           7'h01: dat_o <= swa_dir; // SWACNT
-          7'h02: dat_o <= {~sw[0], ~sw[1], 2'b11, sw[2], 1'b1, buttons[SELECT], buttons[RESET]}; // SWCHB
+          7'h02: dat_o <= {~sw[1], ~sw[0], 2'b11, sw[2], 1'b1, buttons[SELECT], buttons[RESET]}; // SWCHB
           7'h03: dat_o <= {2'b0, swb_dir[5:4], 1'b0, swb_dir[2], 2'b0}; // SWBCNT
           7'h04: begin; dat_o <= intim; underflow <= 0; end // INTIM
           7'h05: begin dat_o <= {instat, 6'b0}; instat[0] <= 0; end// INSTAT
